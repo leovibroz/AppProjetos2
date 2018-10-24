@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col l3 m3 s3">
+                <div class="card">
+                    <div class="card-content center">
+                        <a class="btn-floating btn-small waves-effect waves-light red" id="ligado"><i class="material-icons"></i></a></br>
+                        <a class="waves-effect waves-light btn btn-small" id="ligar">On/off</a></br>
+                        <a class="waves-effect waves-light btn btn-small" id="resetar">Resetar</a></br>
+                        <a class="waves-effect waves-light btn btn-small" id="calibrar">Calibrar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col l9 m9 s9">
+                <div class="card center">
+                    <span class="card-title">Tensão (V)</span>
+                    <div class="card-content center">
+                        <b id="tensao"></b>
+                        <b> V</b>
+                    </div>
+                </div>
+
+
+                <div class="card center">
+                    <span class="card-title">Corrente (A)</span>
+                    <div class="card-content center">
+                        <b id="corrente"></b>
+                        <b> A</b>
+                    </div>
+                </div>
+                <div class="card center">
+                    <span class="card-title ">Temperatura (°C)</span>
+                    <div class="card-content center">
+                        <b id="temperatura"></b>
+                        <b> °C</b>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="controller.js"></script>
+<link href="index.css" rel="stylesheet" />
+
+</html>
