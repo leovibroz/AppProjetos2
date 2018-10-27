@@ -9,7 +9,7 @@
 var app = require('../app.js');
 var db = require('./db.js');
 var isSuccess = false;
-var arduinoOn = false;
+ isArduinoOn = false;
 
 exports.isMqttSuccess = function () {
   return isSuccess;
@@ -27,7 +27,14 @@ exports.connectMqtt = function () {
   // subscribe to topics
   client.subscribe('data', function (err) {
     if (!err) {
+      // Tells app that mqtt has connected
       app.mqttConnected();
+    }
+  });
+
+  client.subscribe('arduinoConnected', function (err) {
+    if (err) {
+      console.log("Cant subscribe to arduinoConnected")
     }
   });
 
@@ -37,9 +44,17 @@ exports.connectMqtt = function () {
       case 'data':
         console.log("Received '" + message + "' on '" + topic + "'");
         db.saveToDb(message);
+        app.sendData(JSON.parse(message));
         break;
+      case 'arduinoConnected':  
+        console.log("Received '" + message + "' on '" + topic + "'");
+        // Tells app that arduino mqtt has connected
+        app.mqttArduinoConnected();
     }
   });
+
+
+  
 
   exports.disconnectMqtt = function () {
     client.end();

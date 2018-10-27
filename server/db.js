@@ -3,8 +3,10 @@ path = './database/data.json';
 
 
 exports.saveToDb= function saveToDb(message) {
-    let data = JSON.parse(db.readFileSync(path).toString());
-    data[Date.parse(toDate(generateDate()))] = JSON.parse(message.toString());
+   // let data = JSON.parse(db.readFileSync(path).toString());
+     let data;
+    //data[Date.parse(toDate(generateDate()))] = JSON.parse(message.toString());
+    data =JSON.parse(message.toString());
     db.writeFile(path, JSON.stringify(data), function (err) {
       if (err) {
         console.log("Erro!")

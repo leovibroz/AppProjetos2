@@ -1,10 +1,12 @@
-const btnConectar = document.querySelector("#ligado");
+const btnConectar = document.querySelector("#serverConectado");
 const btnLigar = document.querySelector("#ligar");
 const btnResetar = document.querySelector("#resetar");
+const rele = document.querySelector('#rele');
 const tensao = document.querySelector('#tensao');
 const corrente = document.querySelector('#corrente');
 const temperatura = document.querySelector('#temperatura');
 isMqttOn = false;
+
 
 // Socket communication
 var socket = io.connect('http://localhost:3000');
@@ -17,16 +19,28 @@ socket.on('serverComand', function (data) {
             isMqttOn = true;
             btnConectar.classList.remove('red');
             btnConectar.classList.add('green');
-            dataRequestStart();
             break;
         case 'mqttDisconnect':
             console.log('desconectou!')
             isMqttOn = false;
             btnConectar.classList.remove('green');
             btnConectar.classList.add('red');
+            rele.innerHTML = '';
+            tensao.innerHTML = '';
+            corrente.innerHTML = '';
+            temperatura .innerHTML = '';
             break;
     }
 });
+
+socket.on('medicao',function(data){
+    console.log(data);
+    console.log(data.tensao);
+    console.log(data.corrente);
+    console.log(data.temperatura);
+    updateValues(data);
+
+})
 
 btnConectar.addEventListener('click', function (event) {
     if (!isMqttOn) {
@@ -59,23 +73,22 @@ btnResetar.addEventListener('click', function (event) {
 });
 
 
-//  Data Request
-function dataRequestStart(){
-    setInterval(function () {
-    if(isMqttOn){
-        socket.emit('medicao', 'requisitando');
-        updateValues();
+function updateValues(data) {
+    if(data.rele){
+        rele.innerHTML = "Ligado";
+    }else{
+        rele.innerHTML = "Desligado";
     }
-}, 5000)
-function updateValues(){
-    let dados = sessionStorage.getItem('dados');
+    tensao.innerHTML = parseFloat(data.tensao).toFixed(2);
+    corrente.innerHTML = parseFloat(data.corrente).toFixed(2);;
+    temperatura .innerHTML = parseFloat(data.temperatura).toFixed(2);;
 }
-}
-// Recebendo Dados
-socket.on('dados', function (data) {
-    console.log(data)
-    sessionStorage.setItem('dados', JSON.stringify(data));
-});
+
+// // Recebendo Dados
+// socket.on('dados', function (data) {
+//     console.log(data)
+//     sessionStorage.setItem('dados', JSON.stringify(data));
+// });
 
 function toDate(a) {
     dateString = a.toString();
