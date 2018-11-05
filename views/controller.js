@@ -1,6 +1,7 @@
 const btnConectar = document.querySelector("#serverConectado");
 const btnLigar = document.querySelector("#ligar");
-const btnResetar = document.querySelector("#resetar");
+const btnCalibrar = document.querySelector("#calibrar");
+const tensaoMedida = document.querySelector("#tensaoMedida")
 const rele = document.querySelector('#rele');
 const tensao = document.querySelector('#tensao');
 const corrente = document.querySelector('#corrente');
@@ -61,17 +62,16 @@ btnLigar.addEventListener('click', function (event) {
     }
     event.preventDefault();
 });
-btnResetar.addEventListener('click', function (event) {
+
+btnCalibrar.addEventListener('click', function (event) {
     if (!isMqttOn) {
         console.log('Nao esta conectado');
     } else {
-        socket.emit('pageComand', 'resetarDb');
-        console.log('Emitting Resetar!');
-        sessionStorage.removeItem('dados');
+        console.log("Calibrando: "+ tensaoMedida.value);
+        socket.emit("calibrarMedida",tensaoMedida.value);
     }
     event.preventDefault();
 });
-
 
 function updateValues(data) {
     if(data.rele){

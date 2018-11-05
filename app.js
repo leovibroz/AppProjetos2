@@ -15,12 +15,17 @@ function main() {
     // Socket handling
     io.on('connection', function (socket) {
 
-        socket.on('envieDados', function (mensagem) {
-            console.log("Enviando dados")
-            let data = db.getDB();
-            socket.emit('dados', data);
-        });
+        // socket.on('envieDados', function (mensagem) {
+        //     console.log("Enviando dados")
+        //     let data = db.getDB();
+        //     socket.emit('dados', data);
+        // });
 
+
+        socket.on('calibrarMedida',function(mensagem){
+            console.log("Calibrando: " + mensagem);
+            mqtt.publishMessage('calibrarMedida',mensagem);
+        })
         socket.on('pageComand', function (mensagem) {
             console.log(mensagem);
             switch (mensagem) {
@@ -40,9 +45,9 @@ function main() {
                     let data;
                     data = db.getDB();
                     if(data.rele){
-                        mqtt.publishMessage('arduinoComand', "f")
+                        mqtt.publishMessage('arduinoComand', "off")
                     }else{
-                        mqtt.publishMessage('arduinoComand', "o")
+                        mqtt.publishMessage('arduinoComand', "on")
                     }
                     break;
                 case 'resetarDb':
