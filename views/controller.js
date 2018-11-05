@@ -29,12 +29,13 @@ socket.on('serverComand', function (data) {
             rele.innerHTML = '';
             tensao.innerHTML = '';
             corrente.innerHTML = '';
-            temperatura .innerHTML = '';
+            temperatura.innerHTML = '';
             break;
     }
 });
 
-socket.on('medicao',function(data){
+socket.on('medicao', function (data) {
+
     console.log(data);
     console.log(data.tensao);
     console.log(data.corrente);
@@ -46,10 +47,14 @@ socket.on('medicao',function(data){
 btnConectar.addEventListener('click', function (event) {
     if (!isMqttOn) {
         socket.emit('pageComand', 'mqttConnect');
-        console.log('Emitting mqttConnect!')
+        console.log('Emitting mqttConnect!');
     } else {
         socket.emit('pageComand', 'mqttDisconnect');
-        console.log('Emitting mqttDisconnect!')
+        console.log('Emitting mqttDisconnect!');
+        rele.innerHTML = "";
+        tensao.innerHTML = 0;
+        corrente.innerHTML = 0;
+        temperatura.innerHTML = 0;
     }
     event.preventDefault();
 });
@@ -67,21 +72,24 @@ btnCalibrar.addEventListener('click', function (event) {
     if (!isMqttOn) {
         console.log('Nao esta conectado');
     } else {
-        console.log("Calibrando: "+ tensaoMedida.value);
-        socket.emit("calibrarMedida",tensaoMedida.value);
+                console.log(Number(tensaoMedida.value));
+                if(!isNaN(Number(tensaoMedida.value))){
+                    console.log("Calibrando: " + tensaoMedida.value);
+                    socket.emit("calibrarMedida", tensaoMedida.value);
+                }
     }
     event.preventDefault();
 });
 
 function updateValues(data) {
-    if(data.rele){
+    if (data.rele) {
         rele.innerHTML = "Ligado";
-    }else{
+    } else {
         rele.innerHTML = "Desligado";
     }
     tensao.innerHTML = parseFloat(data.tensao).toFixed(2);
     corrente.innerHTML = parseFloat(data.corrente).toFixed(2);;
-    temperatura .innerHTML = parseFloat(data.temperatura).toFixed(2);;
+    temperatura.innerHTML = parseFloat(data.temperatura).toFixed(2);;
 }
 
 // // Recebendo Dados
@@ -100,4 +108,13 @@ function toDate(a) {
     var sec = dateString.substring(12, 14)
     var date = new Date(year, month - 1, day, min, hr, sec);
     return date;
+}
+
+function isNumber(n){
+
+    if( Number(n)===n && n % 1 ===0 || n %1 !== 0 ){
+        return true;
+    }else return false;
+
+
 }

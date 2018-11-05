@@ -46,10 +46,10 @@ exports.connectMqtt = function () {
         db.saveToDb(message);
         app.sendData(JSON.parse(message));
         break;
-      case 'arduinoConnected':  
-        console.log("Received '" + message + "' on '" + topic + "'");
-        // Tells app that arduino mqtt has connected
-        app.mqttArduinoConnected();
+      // case 'arduinoConnected':  
+      //   console.log("Received '" + message + "' on '" + topic + "'");
+      //   // Tells app that arduino mqtt has connected
+      //   app.mqttArduinoConnected();
     }
   });
 

@@ -36,7 +36,7 @@ function main() {
                     break;
                 case 'mqttDisconnect':
                     // Conecta MQTT
-                    console.log('disconnecting')
+                    console.log('desconectando do Mqtt')
                     mqtt.disconnectMqtt();
                     break;
                 case 'Liga_desliga':
@@ -50,24 +50,24 @@ function main() {
                         mqtt.publishMessage('arduinoComand', "on")
                     }
                     break;
-                case 'resetarDb':
-                    console.log('Resetando DB');
-                    db.resetarDb();
-                    break;
+                // case 'resetarDb':
+                //     console.log('Resetando DB');
+                //     db.resetarDb();
+                //     break;
             }
         });
 
 
 
-        exports.mqttArduinoConnected = function () {
-            console.log('Arduino connected to MQTT');
-            isArduinoOn = true;
-            socket.emit('serverComand', 'mqttArduinoConnected')
-        }
-        exports.mqttArduinoDisconnected = function () {
-            console.log('Arduino disconnected from MQTT');
-            socket.emit('serverComand', 'mqttArduinoDisconnected')
-        }
+        // exports.mqttArduinoConnected = function () {
+        //     console.log('Arduino connected to MQTT');
+        //     isArduinoOn = true;
+        //     socket.emit('serverComand', 'mqttArduinoConnected')
+        // }
+        // exports.mqttArduinoDisconnected = function () {
+        //     console.log('Arduino disconnected from MQTT');
+        //     socket.emit('serverComand', 'mqttArduinoDisconnected')
+        // }
 
         exports.mqttConnected = function () {
             console.log('App connected to MQTT');
