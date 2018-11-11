@@ -89,7 +89,7 @@ function updateValues(data) {
     }
     tensao.innerHTML = parseFloat(data.tensao).toFixed(2);
     corrente.innerHTML = parseFloat(data.corrente).toFixed(2);;
-    temperatura.innerHTML = parseFloat(data.temperatura).toFixed(2);;
+    temperatura.innerHTML = parseFloat(data.temperatura).toFixed(0);;
 }
 
 // // Recebendo Dados

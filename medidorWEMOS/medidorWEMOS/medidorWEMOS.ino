@@ -4,21 +4,29 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <String.h>
-// Variaveis Sensor Temperatura
-const int TempIn = D3;
-float temperatura;
-float fatorTemperatura;
+
+
+
+// Variaveis MUX
+const int S0 = 14;
+const int S1 = 12;
+const int S2 = 13;
+const int S3 = 15;
 
 // Variaveis Sensor Corrente
-const int AmpIn = A0;
-float corrente;
+const int portAmpIn = 0;
 EnergyMonitor emon1;
 double fatorCorrente = 7.14;
 
+
+// Variavel Leitura Analogica
+const int analogIn = A0;
+const int VRef = emon1.readVcc();
+const int delayBetween = 300;
+
+
 // Variaveis Sensor Tensao
-const int VIn = D5;
-float tensao;
-double amostras = 1000;
+const int portVIn = 1;
 double fatorTensao;
 double tensaoMedida = 120;
 char incomingByte;
@@ -26,6 +34,11 @@ char incomingByte;
 // Variaveis Rele
 const int rele = 4;
 boolean isReleOn = false;
+
+// Variaveis Sensor Temperatura
+const int portTempIn = 2;
+float fatorTemperatura = 10;
+
 
 // Wifi & mqtt
 const char* ssid = "Andrff";        //SSID da rede WIFI
@@ -58,11 +71,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
       //Serial.print((char)payload[i]);
     }
     message[length + 1] = '\0';
-    
+
     Serial.println(message);
-    
+
     char medida[length];
-    
+
     for (int i = 0; i < length ; i++) {
       medida[i] = message[i];
     }
@@ -96,9 +109,22 @@ void reconnect() {
 }
 
 void setup() {
+  delay(1000);
   pinMode(BUILTIN_LED, OUTPUT);  //DEFINE O PINO COMO SAÍDA
-  digitalWrite(BUILTIN_LED, HIGH);
+  digitalWrite(BUILTIN_LED, LOW);
   Serial.begin(115200);
+
+  // Rele Setup
+  pinMode(rele, OUTPUT);
+
+  // MUX Setup
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  pinMode(S3, OUTPUT);
+
+  // Analog Setup
+  pinMode(analogIn, INPUT);
 
   // Wi fi begin
   WiFi.begin(ssid, password);
@@ -112,16 +138,12 @@ void setup() {
   client.setServer("m14.cloudmqtt.com", 17240);
   client.setCallback(callback);
 
+
   // Corrente setup
-  pinMode(AmpIn, INPUT);
-  emon1.current(AmpIn, fatorCorrente);
+  emon1.current(analogIn, fatorCorrente);
 
   // Tensao Setup
   fatorTensao = getFatorTensao(tensaoMedida);
-  pinMode(VIn, INPUT);
-
-  // Rele Setup
-  pinMode(rele, OUTPUT);
 }
 
 void loop() {
@@ -133,19 +155,24 @@ void loop() {
   data["rele"] = isReleOn;
   data["tensao"] = CalcularTensao();
   data["corrente"] = CalcularCorrente();
-  data["temperatura"] = 30;
+  data["temperatura"] = CalcularTemp();
   data.prettyPrintTo(Serial);
   char JSONmessageBuffer[100];
   data.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
   client.publish("data", JSONmessageBuffer);
   delay(1000);
+
+
+
   client.loop();
 }
 
 
 double getFatorTensao(float tensaoMedida) {
   Serial.print("FatorTensao");
-  fatorTensao = ((analogRead(VIn) / 1024.0) * 5000) / tensaoMedida;
+  setPortaMux(1);
+  delay(delayBetween);
+  fatorTensao = ((analogRead(analogIn) / 1024.0) * VRef) / tensaoMedida;
   Serial.print("Calibrando em: ");
   Serial.println(tensaoMedida);
   Serial.print("fator de tensao: ");
@@ -154,12 +181,13 @@ double getFatorTensao(float tensaoMedida) {
 
 }
 double CalcularCorrente() {
-  double v, amp, vf;
+  double amp;
+  setPortaMux(portAmpIn);
+  delay(delayBetween);
   amp = emon1.calcIrms(2960);
   //Serial.print("Corrente:");
   //Serial.println(amp);
   return amp;
-
 }
 
 double CalcularTensao() {
@@ -167,20 +195,60 @@ double CalcularTensao() {
   double vf = 0;
   int i;
 
-  v = analogRead(VIn);
-  v = (v / 1024.0) * 5000;
+  setPortaMux(portVIn);
+  delay(delayBetween);
+  v = analogRead(analogIn);
+  v = (v / 1024.0) * VRef;
   v = v / fatorTensao;
 
   //Serial.print("Tensao:");
   //Serial.println(v);
   return v;
+}
+
+double CalcularTemp() {
+  double temp;
+  double tempf;
+
+  setPortaMux(2);
+  delay(delayBetween);
+  
+  temp = analogRead(analogIn);
+  Serial.println(temp);
+  temp = (temp/1024.0)*(VRef-350);
+  tempf = temp/fatorTemperatura;
+  return tempf;
 
 }
 
-double CalcularTemperatura() {
-
-
-
+void setPortaMux(int num) {
+  switch (num) {
+    case 0:
+      digitalWrite(S0, LOW);
+      digitalWrite(S1, LOW);
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, LOW);
+      break;
+    case 1:
+      digitalWrite(S0, HIGH);
+      digitalWrite(S1, LOW);
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, LOW);
+      break;
+    case 2:
+      digitalWrite(S0, LOW);
+      digitalWrite(S1, HIGH);
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, LOW);
+      break;
+    default:
+      digitalWrite(S0, LOW);
+      digitalWrite(S1, LOW);
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, LOW);
+      break;
+  }
 
 }
+
 
